@@ -1,0 +1,5 @@
+fastapi[standard]
+pydantic
+sacremoses
+numpy<2
+/code/app/vendor/Subtitles-Translator/dist/subtitles_translator-0.0.1-py3-none-any.whl
