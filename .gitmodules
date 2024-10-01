@@ -1,0 +1,3 @@
+[submodule "app/vendor/Subtitles-Translator"]
+	path = app/vendor/Subtitles-Translator
+	url = https://git.skilltech.dev/platform/Subtitles-Translator.git
