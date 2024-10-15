@@ -13,8 +13,6 @@ import requests
 app = FastAPI()
 
 languagePool = ["fr","en", "es", "de", "ru", "ar", "hi", "it", "zh", "nl", "pt"]
-
-
     
 lp = [
   [
