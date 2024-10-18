@@ -3,9 +3,13 @@ FROM python:3.9
 WORKDIR /code
 
 COPY ./requirements.txt /code/requirements.txt
+COPY ./vendor /code/vendor
 
 
 RUN pip install --upgrade -r /code/requirements.txt
+
+COPY ./requirement-subtranslator.txt /code/requirement-subtranslator.txt
+RUN pip install --upgrade -r /code/requirement-subtranslator.txt
 
 COPY ./app /code/app
 

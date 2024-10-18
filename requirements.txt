@@ -2,4 +2,3 @@ fastapi[standard]
 pydantic
 sacremoses
 numpy<2
-subtitles_translator

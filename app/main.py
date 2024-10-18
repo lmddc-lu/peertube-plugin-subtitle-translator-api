@@ -1,5 +1,5 @@
-from typing import Union
-from fastapi import FastAPI, File, UploadFile
+from typing import Union, List, Annotated
+from fastapi import FastAPI, File, UploadFile, Query
 from pydantic import Field
 from typing import Optional
 
@@ -14,9 +14,9 @@ import requests
 import logging
 import json
 
-import torch
-
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
+# Use GPU
+# import torch
+# torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +25,8 @@ logging.basicConfig(level=logging.INFO)
 app = FastAPI()
 
 #From: https://github.com/UKPLab/EasyNMT?tab=readme-ov-file#opus-mt
-# languagePool = ['aav', 'aed', 'af', 'alv', 'am', 'ar', 'art', 'ase', 'az', 'bat', 'bcl', 'be', 'bem', 'ber', 'bg', 'bi', 'bn', 'bnt', 'bzs', 'ca', 'cau', 'ccs', 'ceb', 'cel', 'chk', 'cpf', 'crs', 'cs', 'csg', 'csn', 'cus', 'cy', 'da', 'de', 'dra', 'ee', 'efi', 'el', 'en', 'eo', 'es', 'et', 'eu', 'euq', 'fi', 'fj', 'fr', 'fse', 'ga', 'gaa', 'gil', 'gl', 'grk', 'guw', 'gv', 'ha', 'he', 'hi', 'hil', 'ho', 'hr', 'ht', 'hu', 'hy', 'id', 'ig', 'ilo', 'is', 'iso', 'it', 'ja', 'jap', 'ka', 'kab', 'kg', 'kj', 'kl', 'ko', 'kqn', 'kwn', 'kwy', 'lg', 'ln', 'loz', 'lt', 'lu', 'lua', 'lue', 'lun', 'luo', 'lus', 'lv', 'map', 'mfe', 'mfs', 'mg', 'mh', 'mk', 'mkh', 'ml', 'mos', 'mr', 'ms', 'mt', 'mul', 'ng', 'nic', 'niu', 'nl', 'no', 'nso', 'ny', 'nyk', 'om', 'pa', 'pag', 'pap', 'phi', 'pis', 'pl', 'pon', 'poz', 'pqe', 'pqw', 'prl', 'pt', 'rn', 'rnd', 'ro', 'roa', 'ru', 'run', 'rw', 'sal', 'sg', 'sh', 'sit', 'sk', 'sl', 'sm', 'sn', 'sq', 'srn', 'ss', 'ssp', 'st', 'sv', 'sw', 'swc', 'taw', 'tdt', 'th', 'ti', 'tiv', 'tl', 'tll', 'tn', 'to', 'toi', 'tpi', 'tr', 'trk', 'ts', 'tum', 'tut', 'tvl', 'tw', 'ty', 'tzo', 'uk', 'umb', 'ur', 've', 'vi', 'vsl', 'wa', 'wal', 'war', 'wls', 'xh', 'yap', 'yo', 'yua', 'zai', 'zh', 'zne']
-languagePool = ["fr","en", "es", "de", "ru", "ar", "hi", "it", "zh", "nl", "pt"]
+languagePool = ['aav', 'aed', 'af', 'alv', 'am', 'ar', 'art', 'ase', 'az', 'bat', 'bcl', 'be', 'bem', 'ber', 'bg', 'bi', 'bn', 'bnt', 'bzs', 'ca', 'cau', 'ccs', 'ceb', 'cel', 'chk', 'cpf', 'crs', 'cs', 'csg', 'csn', 'cus', 'cy', 'da', 'de', 'dra', 'ee', 'efi', 'el', 'en', 'eo', 'es', 'et', 'eu', 'euq', 'fi', 'fj', 'fr', 'fse', 'ga', 'gaa', 'gil', 'gl', 'grk', 'guw', 'gv', 'ha', 'he', 'hi', 'hil', 'ho', 'hr', 'ht', 'hu', 'hy', 'id', 'ig', 'ilo', 'is', 'iso', 'it', 'ja', 'jap', 'ka', 'kab', 'kg', 'kj', 'kl', 'ko', 'kqn', 'kwn', 'kwy', 'lg', 'ln', 'loz', 'lt', 'lu', 'lua', 'lue', 'lun', 'luo', 'lus', 'lv', 'map', 'mfe', 'mfs', 'mg', 'mh', 'mk', 'mkh', 'ml', 'mos', 'mr', 'ms', 'mt', 'mul', 'ng', 'nic', 'niu', 'nl', 'no', 'nso', 'ny', 'nyk', 'om', 'pa', 'pag', 'pap', 'phi', 'pis', 'pl', 'pon', 'poz', 'pqe', 'pqw', 'prl', 'pt', 'rn', 'rnd', 'ro', 'roa', 'ru', 'run', 'rw', 'sal', 'sg', 'sh', 'sit', 'sk', 'sl', 'sm', 'sn', 'sq', 'srn', 'ss', 'ssp', 'st', 'sv', 'sw', 'swc', 'taw', 'tdt', 'th', 'ti', 'tiv', 'tl', 'tll', 'tn', 'to', 'toi', 'tpi', 'tr', 'trk', 'ts', 'tum', 'tut', 'tvl', 'tw', 'ty', 'tzo', 'uk', 'umb', 'ur', 've', 'vi', 'vsl', 'wa', 'wal', 'war', 'wls', 'xh', 'yap', 'yo', 'yua', 'zai', 'zh', 'zne']
+# languagePool = ["fr","en", "es", "de", "ru", "ar", "hi", "it", "zh", "nl", "pt"]
   
 
 # @app.get("/existing_language_pairs/cached")
@@ -55,27 +55,36 @@ def check_language_pair_exists(lang1: str, lang2: str) -> bool:
     except requests.RequestException:
         return False
 
-        
 @app.get("/existing_language_pairs")
-def get_existing_language_pairs(use_cache : bool = True, delay: float = 0.1):
+def get_existing_language_pairs(desired_languages : Annotated[Union[list[str], None], Query()] = None, use_cache: bool = True, delay: float = 0.1):
   """
   Get all existing language pairs from the language pool.
 
   Args:
-  delay (float): Delay between requests to avoid rate limiting.
+  desired_languages (Optional[List[str]]): List of desired languages to filter the pairs.
   use_cache (bool): Whether to use the cached language pairs.
+  delay (float): Delay between requests to avoid rate limiting.
 
   Returns:
   List[tuple[str, str]]: A list of tuples containing valid language pairs.
   """
+  
+  print(str(desired_languages))
   if use_cache:
     try:
       # Check if there is a language pair file
       with open("/code/data/language_pairs.json", "r") as file:
+        logger.info("using cached language pairs")
         content = file.read()
         existing_pairs = json.loads(content)
-        return existing_pairs
+        existing_pairs_filtered = []
+        if desired_languages:
+          existing_pairs_filtered = [pair for pair in existing_pairs if pair[0] in desired_languages and pair[1] in desired_languages]
+        else:
+          existing_pairs_filtered = existing_pairs
+        return existing_pairs_filtered
     except FileNotFoundError:
+      logger.info("Could not find cached language pairs")
       pass
 
   existing_pairs = []
@@ -88,7 +97,14 @@ def get_existing_language_pairs(use_cache : bool = True, delay: float = 0.1):
   output = sorted(existing_pairs)
   with open("/code/data/language_pairs.json", "w") as file:
     file.write(json.dumps(output))
-  return output
+  
+  # Filter the pairs based on the desired languages
+  filtered_output = []
+  if desired_languages:
+    filtered_output = [pair for pair in output if pair[0] in desired_languages and pair[1] in desired_languages]
+  else:
+    filtered_output = output
+  return filtered_output
 
 # Helper function to generate all possible pairs
 def generate_all_pairs(pool: list[str]) -> list[tuple[str, str]]:
