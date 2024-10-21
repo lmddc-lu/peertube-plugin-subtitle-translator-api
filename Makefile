@@ -8,7 +8,7 @@ stop:
 	-docker rm subtitle_translator_api_cpu 2> /dev/null
 	-docker rm subtitle_translator_api_gpu 2> /dev/null
 
-# This requires poetry and python 3.9 installed
+# This requires poetry and python 3.9 to be installed
 build-subtitle-translator:
 	cd vendor/Subtitles-Translator && poetry install && poetry build
 
@@ -19,10 +19,10 @@ build-gpu:
 	docker build -t subtitle_translator_api -f ./Dockerfile.gpu .
 
 run-cpu: stop build-cpu
-	docker run --name subtitle_translator_api_cpu -d -p $(API_PORT):80 -v data:/code/data subtitle_translator_api
+	docker run --name subtitle_translator_api_cpu -d -p $(API_PORT):80 -v subtitle_translation_data:/code/data subtitle_translator_api
 
 run-gpu: stop build-gpu
-	docker run --name subtitle_translator_api_gpu --gpus all -d -p $(API_PORT):80 -v data:/code/data subtitle_translator_api
+	docker run --name subtitle_translator_api_gpu --gpus all -d -p $(API_PORT):80 -v subtitle_translation_data:/code/data subtitle_translator_api
 
 run:
 	if [ $(USE_GPU) = "true" ]; then \
