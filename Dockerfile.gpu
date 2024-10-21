@@ -8,10 +8,10 @@ COPY ./requirements.txt /code/requirements.txt
 COPY ./requirement-subtranslator.txt /code/requirement-subtranslator.txt
 COPY ./vendor /code/vendor
 
-
 RUN pip install --upgrade -r /code/requirements.txt
 
 COPY ./app /code/app
 
+ENV USE_GPU=true
 
 CMD ["fastapi", "run", "app/main.py", "--port", "80", "--workers", "8"]
