@@ -12,6 +12,8 @@ RUN pip install --upgrade -r /code/requirement-subtranslator.txt
 
 COPY ./app /code/app
 
+COPY ./data/language_pairs.json /code/data/language_pairs.json
+
 ENV USE_GPU=false
 
 CMD ["fastapi", "run", "app/main.py", "--port", "80", "--workers", "8"]
